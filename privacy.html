@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy · Bimmer Cockpit</title>
+<link rel="icon" href="icon.png">
+<style>
+    :root { --bg: #0E1116; --card: #171B22; --stroke: #232934; --text: #E8EAED; --dim: #8A93A0; --accent: #3BA7FF; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    a { color: var(--accent); }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 32px 16px 56px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: 0.15em; color: var(--text); text-decoration: none; }
+    .brand img { width: 30px; height: 30px; border-radius: 7px; }
+    h1 { font-size: 32px; margin: 32px 0 4px; }
+    h2 { font-size: 20px; margin: 32px 0 8px; }
+    p, li { color: #cbd5e1; }
+    .date { color: var(--dim); margin: 0 0 24px; }
+    ul { padding-left: 22px; }
+    li { margin: 6px 0; }
+    strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <a class="brand" href="./"><img src="icon.png" alt="">BIMMER COCKPIT</a>
+
+    <h1>Privacy Policy</h1>
+    <p class="date">Last updated: October 2026</p>
+
+    <p>Bimmer Cockpit (“the app”) is the companion app for the Bimmer Cockpit module, a self-built device fitted
+        behind the dashboard of a car with a Siemens MS43 engine computer. The app talks to that module over a USB cable
+        or over the module's own local Wi-Fi network.</p>
+
+    <h2>Data the developer collects</h2>
+    <p>None. The app has no accounts, analytics, advertising or crash reporting, and it never sends data to the
+        developer.</p>
+
+    <h2>Data the app handles on your device</h2>
+    <ul>
+        <li><strong>Module status and settings</strong>: temperatures, fan speed, AC state, engine data, warning lamps
+            and thermostat settings. They are read from and written to the module, shown on screen, and the settings
+            are stored on the module.</li>
+        <li><strong>Engine logs</strong>: when you record (by hand, or automatically while the engine runs), the
+            engine data and AC state are saved as CSV files in the app's own storage on the head unit. They stay there
+            until you delete them in the app or uninstall it.</li>
+        <li><strong>Engine diagnosis</strong>: analysing a log runs entirely on the device. Nothing is uploaded for
+            it.</li>
+    </ul>
+
+    <h2>Google Drive (optional)</h2>
+    <p>If you tap <strong>Connect Drive</strong>, the app asks you to sign in with Google and grant access to Google
+        Drive with the <code>drive.file</code> permission, which only covers files the app itself creates. The app then
+        uploads your engine logs to an “Bimmer Cockpit logs” folder in <strong>your own</strong> Google Drive, automatically
+        if Auto-upload is on. The files go directly from your device to your Google account; the developer never
+        receives them or your Google account details. Google's handling of that data is covered by
+        <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
+    <p>You can turn off Auto-upload or tap <strong>Disconnect Drive</strong> in the app at any time, and remove the
+        app's access to your Google account at
+        <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Logs already in your
+        Drive stay there until you delete them.</p>
+
+    <h2>Sharing</h2>
+    <p>When you use <strong>Share</strong> on a log or a diagnosis report, the app hands it to the app you choose
+        through Android's share sheet. What happens next is up to that app.</p>
+
+    <h2>Permissions</h2>
+    <ul>
+        <li><strong>USB</strong>: to talk to the module over its cable.</li>
+        <li><strong>Location</strong> (Android 10–12) and <strong>Nearby Wi-Fi devices</strong> (Android 13+): Android
+            requires these for an app to find and join a Wi-Fi network. The app uses them only to connect to the
+            module's hidden network and never reads or stores your location.</li>
+        <li><strong>Internet / network state / Wi-Fi state</strong>: to talk to the module over its local network, and
+            to upload logs to Google Drive when you have connected it.</li>
+    </ul>
+
+    <h2>Children</h2>
+    <p>The app is not directed at children.</p>
+
+    <h2>Changes</h2>
+    <p>Any changes to this policy will be posted on this page.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy: the developer contact email on the app's Google Play listing.</p>
+</div>
+</body>
+</html>

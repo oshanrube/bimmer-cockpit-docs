@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bimmer Cockpit</title>
+<meta name="description" content="Bimmer Cockpit: climate control, live MS43 gauges, engine logging and on-board diagnosis for MS43-powered BMW E-series cars. A small ESP32 module behind the dash and an Android app on the head unit.">
+<link rel="icon" href="icon.png">
+<style>
+    :root {
+        --bg: #0E1116;
+        --card: #171B22;
+        --stroke: #232934;
+        --button: #232A35;
+        --text: #E8EAED;
+        --dim: #8A93A0;
+        --accent: #3BA7FF;
+        --accent-text: #06121F;
+        --ok: #3DDC84;
+        --warn: #FFB020;
+        --fault: #FF5252;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+    /* ---- top bar ---- */
+    header.bar {
+        position: sticky; top: 0; z-index: 5;
+        background: rgba(14, 17, 22, 0.92);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--stroke);
+    }
+    header.bar .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: 0.15em; }
+    .brand img { width: 30px; height: 30px; border-radius: 7px; }
+    nav { margin-left: auto; display: flex; gap: 20px; font-size: 15px; }
+    nav a { color: var(--dim); }
+    nav a:hover { color: var(--text); text-decoration: none; }
+    @media (max-width: 720px) { nav { display: none; } }
+
+    /* ---- hero ---- */
+    .hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 40px; align-items: center; }
+    .hero h1 { font-size: clamp(34px, 5vw, 52px); line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .hero h1 span { color: var(--accent); }
+    .hero p.lead { color: var(--dim); font-size: 19px; margin: 0 0 28px; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+        display: inline-flex; align-items: center; height: 48px; padding: 0 22px;
+        border-radius: 12px; background: var(--button); color: var(--text);
+        font-weight: 600; letter-spacing: 0.04em; font-size: 15px;
+    }
+    .btn.primary { background: var(--accent); color: var(--accent-text); }
+    .btn:hover { text-decoration: none; filter: brightness(1.12); }
+    .shot {
+        display: block; width: 100%; height: auto;
+        border-radius: 14px; border: 1px solid var(--stroke);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+    .chips li {
+        font-size: 13px; color: var(--dim); border: 1px solid var(--stroke);
+        border-radius: 999px; padding: 4px 12px;
+    }
+    @media (max-width: 860px) {
+        .hero { grid-template-columns: 1fr; padding-top: 40px; }
+    }
+
+    /* ---- sections ---- */
+    section { padding: 56px 0; border-top: 1px solid var(--stroke); }
+    h2 { font-size: 30px; margin: 0 0 8px; }
+    .label {
+        color: var(--accent); font-size: 13px; font-weight: 600;
+        letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .sub { color: var(--dim); margin: 0 0 32px; max-width: 760px; }
+
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+        background: var(--card); border: 1px solid var(--stroke);
+        border-radius: 14px; padding: 20px 22px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { margin: 0; color: var(--dim); font-size: 15.5px; }
+    .card .icon { font-size: 22px; margin-bottom: 8px; display: block; }
+    @media (max-width: 900px) { .features { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+
+    .split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+    .split.flip { grid-template-columns: 1fr 1.2fr; }
+    .split.flip .media { order: 2; }
+    .split ul { color: var(--dim); padding-left: 20px; margin: 12px 0 0; }
+    .split ul li { margin: 6px 0; }
+    .split ul strong { color: var(--text); font-weight: 600; }
+    .stack { display: grid; gap: 14px; }
+    @media (max-width: 860px) {
+        .split, .split.flip { grid-template-columns: 1fr; }
+        .split.flip .media { order: 0; }
+    }
+
+    .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .gallery figure { margin: 0; }
+    .gallery figcaption { color: var(--dim); font-size: 14px; margin-top: 8px; }
+    @media (max-width: 700px) { .gallery { grid-template-columns: 1fr; } }
+
+    pre.diagram {
+        background: var(--card); border: 1px solid var(--stroke); border-radius: 14px;
+        padding: 18px 20px; overflow-x: auto; font-size: 13.5px; line-height: 1.5; color: #cbd5e1;
+        margin: 0;
+    }
+    .note { color: var(--dim); font-size: 14px; margin-top: 14px; }
+
+    .steps { counter-reset: step; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .steps .card { position: relative; padding-top: 46px; }
+    .steps .card::before {
+        counter-increment: step; content: counter(step);
+        position: absolute; top: 16px; left: 22px;
+        width: 24px; height: 24px; border-radius: 50%;
+        background: var(--accent); color: var(--accent-text);
+        font-size: 14px; font-weight: 700; display: grid; place-items: center;
+    }
+    @media (max-width: 800px) { .steps { grid-template-columns: 1fr; } }
+
+    footer { border-top: 1px solid var(--stroke); padding: 28px 0 40px; color: var(--dim); font-size: 14px; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+    <div class="wrap">
+        <div class="brand"><img src="icon.png" alt="">BIMMER COCKPIT</div>
+        <nav>
+            <a href="#features">Features</a>
+            <a href="#climate">Climate</a>
+            <a href="#gauges">Gauges</a>
+            <a href="#logs">Logs</a>
+            <a href="#hardware">Hardware</a>
+            <a href="#get">Get it</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+<div class="wrap hero">
+    <div>
+        <h1>The cockpit your <span>MS43</span> was missing</h1>
+        <p class="lead">
+            A small module behind the dash connects your MS43 to the Android head unit: automatic
+            climate control for M54 swaps, live engine gauges, fault codes, and engine logs with an
+            on-board diagnosis. Built for MS43-powered BMW E-series cars, developed on an M54B30-swapped E36.
+        </p>
+        <div class="buttons">
+            <a class="btn primary" href="#get">Get Bimmer Cockpit</a>
+            <a class="btn" href="#features">See the features</a>
+        </div>
+        <ul class="chips">
+            <li>MS43 · M54</li><li>ESP32-C3</li><li>CAN 500 kbit/s</li><li>K-line DS2</li><li>Android 10+</li>
+        </ul>
+    </div>
+    <img class="shot" src="screenshots/climate.png" alt="Climate screen: cabin temperature, target, auto/manual mode, fan speed, compressor, evaporator, AC pressure and engine tiles" width="1280" height="720">
+</div>
+
+<section id="features">
+    <div class="wrap">
+        <div class="label">Features</div>
+        <h2>Everything in one module</h2>
+        <p class="sub">The module does the work on its own; the app on the head unit is the display and the settings. The climate features are for M54/MS43 swaps into cars whose climate control and cluster don't talk CAN (E30, E36, Z3 …); gauges, fault codes, logging and diagnosis work with any MS43.</p>
+        <div class="features">
+            <div class="card"><span class="icon">❄️</span><h3>Automatic climate</h3>
+                <p>Holds the cabin at a target temperature: runs the compressor on two thermostats and picks the blower speed, 1 to 4.</p></div>
+            <div class="card"><span class="icon">⚙️</span><h3>Idle-up over CAN</h3>
+                <p>Asks the MS43 to raise the idle before the compressor engages, the same CAN message an E46 cluster sends.</p></div>
+            <div class="card"><span class="icon">🛡️</span><h3>Compressor protection</h3>
+                <p>Freeze guard on the evaporator and refrigerant-pressure cut-outs for an empty or over-pressured system.</p></div>
+            <div class="card"><span class="icon">📈</span><h3>Live MS43 gauges</h3>
+                <p>Tachometer, temperatures, MAF, ignition, fuel trims, VANOS and more, streamed 30 times a second over USB.</p></div>
+            <div class="card"><span class="icon">⚠️</span><h3>Cluster warning lamps</h3>
+                <p>Lights the old cluster's CHECK ENGINE and EML lamps from the MS43, with a bulb check at key-on.</p></div>
+            <div class="card"><span class="icon">🔧</span><h3>Fault codes</h3>
+                <p>Reads and clears the MS43 fault memory over the K-line, straight from the app.</p></div>
+            <div class="card"><span class="icon">⏺️</span><h3>Engine logging</h3>
+                <p>Records K-line and CAN engine data with the AC state as CSV, automatically every time the engine runs.</p></div>
+            <div class="card"><span class="icon">🩺</span><h3>On-board diagnosis</h3>
+                <p>Analyses each log on the head unit with the Gauge.S analyser: likely faults ranked worst first, with evidence.</p></div>
+            <div class="card"><span class="icon">☁️</span><h3>Google Drive upload</h3>
+                <p>Finished logs go to an “Bimmer Cockpit logs” folder in your Drive, including logs recorded while offline.</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="climate">
+    <div class="wrap split">
+        <div class="media stack">
+            <img class="shot" src="screenshots/climate.png" alt="Climate screen" width="1280" height="720" loading="lazy">
+            <img class="shot" src="screenshots/climate-overrides.png" alt="Climate screen with the compressor forced on and the pressure sensor ignored, shown with red borders" width="1280" height="720" loading="lazy">
+        </div>
+        <div>
+            <div class="label">Climate</div>
+            <h2>Set a temperature and drive</h2>
+            <p class="sub">A dark, landscape dashboard with big touch keys, made for the head unit.</p>
+            <ul>
+                <li><strong>Auto:</strong> the fan speeds up the further the cabin is above the target and settles as it cools down.</li>
+                <li><strong>Manual:</strong> pick the fan speed yourself, with or without AC.</li>
+                <li><strong>Status at a glance:</strong> compressor state and the reason it's off, evaporator temperature, refrigerant pressure, AC switch and engine.</li>
+                <li><strong>Overrides:</strong> tap the AC switch or Compressor tile to force it on or off. Overridden tiles get a red border; the safety cut-outs still apply.</li>
+                <li><strong>Thermostat settings:</strong> the evaporator off / back-on temperatures and the clutch delay.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="gauges">
+    <div class="wrap split flip">
+        <div class="media stack">
+            <img class="shot" src="screenshots/gauges-analog.png" alt="Analog gauges: tachometer, coolant, oil, throttle, torque, evaporator, cabin and AC pressure" width="1280" height="720" loading="lazy">
+            <img class="shot" src="screenshots/gauges-digital.png" alt="Digital gauges: RPM bar, engine tiles and bank 1 / bank 2 panel" width="1280" height="720" loading="lazy">
+        </div>
+        <div>
+            <div class="label">Gauges</div>
+            <h2>Live engine data</h2>
+            <p class="sub">GAUGES switches the screen to a tuner-style view; swipe left for the digital page.</p>
+            <ul>
+                <li><strong>Analog page:</strong> a big tachometer with peak hold, plus coolant, oil, throttle, torque, torque loss, evaporator, cabin and AC pressure.</li>
+                <li><strong>Digital page:</strong> an RPM bar with shift light, tiles with history lines, and bank 1 / bank 2 trims, O2 heaters and knock sensors.</li>
+                <li><strong>CAN and K-line:</strong> CAN data comes straight from the MS43. The K-line values are decoded from the MS43's replies to a Gauge S, so both can be used at once.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="logs">
+    <div class="wrap split">
+        <div class="media stack">
+            <img class="shot" src="screenshots/logs.png" alt="Engine logs list with Analyse, Share and Delete, and Google Drive upload state" width="1280" height="720" loading="lazy">
+            <img class="shot" src="screenshots/analysis.png" alt="Engine diagnosis of a log: a vacuum leak finding with evidence and suggested checks" width="1280" height="720" loading="lazy">
+        </div>
+        <div>
+            <div class="label">Logs &amp; diagnosis</div>
+            <h2>Record, analyse, keep</h2>
+            <p class="sub">Every drive can be logged and checked for faults, without a laptop.</p>
+            <ul>
+                <li><strong>Auto-record:</strong> a log starts with the engine and ends 15 s after it stops. LOGS in the top bar shows <code>● REC</code> while recording.</li>
+                <li><strong>Gauge.S format:</strong> the columns use the names the Gauge.S log analyser understands, and the AC state comes along.</li>
+                <li><strong>Analyse:</strong> runs the Gauge.S engine diagnosis on the head unit, offline. You get likely faults ranked worst first with their evidence, suggested checks, and the time spent in each operating state.</li>
+                <li><strong>Google Drive:</strong> connect once, and finished logs upload to an “Bimmer Cockpit logs” folder. The app can only see the files it created.</li>
+                <li><strong>Share:</strong> send a log or a diagnosis report to any app.</li>
+            </ul>
+            <p class="note">The diagnosis shown here is from a generated sample log with a vacuum leak injected, not a real drive.</p>
+        </div>
+    </div>
+</section>
+
+<section id="setup">
+    <div class="wrap split flip">
+        <div class="media">
+            <img class="shot" src="screenshots/settings.png" alt="Settings: AC pressure cut-out, engine logs, Google Drive and module firmware" width="760" height="720" loading="lazy" style="max-width:520px;margin:0 auto">
+        </div>
+        <div>
+            <div class="label">Settings &amp; updates</div>
+            <h2>Update the module from the app</h2>
+            <p class="sub">The less-used settings live under ⚙.</p>
+            <ul>
+                <li><strong>Firmware updates over USB:</strong> each app release carries the matching module firmware. Tap Update module and the module flashes its spare slot, checks it and restarts. If anything fails, it keeps the old firmware.</li>
+                <li><strong>Board-safe:</strong> firmware only installs on the board revision it was built for.</li>
+                <li><strong>AC pressure cut-out:</strong> set the cut-out pressure and the re-engage tolerance.</li>
+                <li><strong>USB first, Wi-Fi as a fallback:</strong> over the USB cable the head unit's Wi-Fi stays free for wireless Android Auto. A phone can join the module's hidden Wi-Fi instead.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="hardware">
+    <div class="wrap">
+        <div class="label">Hardware</div>
+        <h2>How it fits together</h2>
+        <p class="sub">An ESP32-C3 on a small board behind the dash, wired into the car harness with one connector.</p>
+        <pre class="diagram"> AC switch (+12V) ─┐
+ NTC evap sensor ──┤  ESP32-C3 ── CAN transceiver ── CAN-H / CAN-L ── MS43
+ NTC cabin sensor ─┤     │
+ AC pressure ──────┤     ├── USB cable (power + data) ── Android app on the head unit
+ Ignition +12V ────┤     └── hidden Wi-Fi "E36-AC" (fallback)
+ Clutch relay ◄────┤  ┐
+ Blower relays ◄───┤  ├ MCP23017 over I²C → ULN2003 (4 blower speeds, clutch, 2 lamps)
+ Cluster lamps ◄───┤  ┘ (CHECK ENGINE, EML)
+ K-line (OBD 7) ◄─►┘  listens to the Gauge S ↔ MS43, reads / clears fault codes</pre>
+        <div class="features" style="margin-top:16px">
+            <div class="card"><h3>v2 · perfboard</h3>
+                <p>ESP32-C3 SuperMini, CAN module, MCP23017, ULN2003 and an LM393 K-line interface, with parts from tronic.lk. This is the board in the car today.</p></div>
+            <div class="card"><h3>v3 · PCB</h3>
+                <p>A proper PCB with an L9637 K-line transceiver, in a PCBWay-assembled SMD build and a hand-soldered build.</p></div>
+            <div class="card"><h3>One harness plug</h3>
+                <p>Ignition, ground, CAN, K-line, the two cluster lamps, the clutch relay and the AC switch on one 9-pin connector, plus the blower relays and sensors.</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="get">
+    <div class="wrap">
+        <div class="label">Get started</div>
+        <h2>Install</h2>
+        <p class="sub">The app is in testing on Google Play and needs the Bimmer Cockpit module fitted to the car.</p>
+        <div class="steps">
+            <div class="card"><h3>Fit the module</h3>
+                <p>The module goes behind the dash on one harness plug: CAN and K-line to the MS43, the AC switch and sensors, the blower and clutch relays, and the cluster lamps.</p></div>
+            <div class="card"><h3>Install the app</h3>
+                <p>Install Bimmer Cockpit on the head unit (Android 10 or later) and plug the module into a USB port. A phone can connect over the module's Wi-Fi instead.</p></div>
+            <div class="card"><h3>Drive</h3>
+                <p>Set a cabin temperature and go. The app keeps the module's firmware up to date and logs every drive.</p></div>
+        </div>
+        <div class="buttons" style="margin-top:28px">
+            <span class="btn" style="cursor:default;opacity:.7">Google Play · coming soon</span>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="wrap">
+        <span>Bimmer Cockpit · a hobby project · not affiliated with or endorsed by BMW AG · <a href="privacy.html">Privacy policy</a></span>
+        <span>Screenshots are rendered from the app with sample data.</span>
+    </div>
+</footer>
+</body>
+</html>
