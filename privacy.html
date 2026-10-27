@@ -45,20 +45,25 @@
         <li><strong>Engine logs</strong>: when you record (by hand, or automatically while the engine runs), the
             engine data and AC state are saved as CSV files in the app's own storage on the head unit. They stay there
             until you delete them in the app or uninstall it.</li>
+        <li><strong>ECU data</strong>: when you tap <strong>Read ECU data</strong>, the app reads the engine
+            computer's part number, stored fault codes and learned fuel and octane adaptations over the K-line and
+            saves them, dated, as a JSON file next to the engine logs. It stays there until you uninstall the app.</li>
         <li><strong>Engine diagnosis</strong>: analysing a log runs entirely on the device. Nothing is uploaded for
-            it.</li>
+            it. The analysis keeps a small summary of each analysed drive (a few averages such as idle speed and fuel
+            trim) in the app's own storage, so later drives can be compared with earlier ones. It stays there until
+            you uninstall the app.</li>
     </ul>
 
     <h2>Google Drive (optional)</h2>
     <p>If you tap <strong>Connect Drive</strong>, the app asks you to sign in with Google and grant access to Google
         Drive with the <code>drive.file</code> permission, which only covers files the app itself creates. The app then
-        uploads your engine logs to an “Bimmer Cockpit logs” folder in <strong>your own</strong> Google Drive, automatically
+        uploads your engine logs and ECU data files to an “Bimmer Cockpit logs” folder in <strong>your own</strong> Google Drive, automatically
         if Auto-upload is on. The files go directly from your device to your Google account; the developer never
         receives them or your Google account details. Google's handling of that data is covered by
         <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
     <p>You can turn off Auto-upload or tap <strong>Disconnect Drive</strong> in the app at any time, and remove the
         app's access to your Google account at
-        <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Logs already in your
+        <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Files already in your
         Drive stay there until you delete them.</p>
 
     <h2>Sharing</h2>
