@@ -181,13 +181,13 @@
             <div class="card"><span class="icon">⚠️</span><h3>Cluster warning lamps</h3>
                 <p>Lights the old cluster's CHECK ENGINE and EML lamps from the MS43, with a bulb check at key-on.</p></div>
             <div class="card"><span class="icon">🔧</span><h3>Fault codes</h3>
-                <p>Reads and clears the MS43 fault memory over the K-line, straight from the app.</p></div>
+                <p>Reads and clears the MS43 fault memory over the K-line, straight from the app, and saves the learned fuel and octane adaptations with the faults for the diagnosis.</p></div>
             <div class="card"><span class="icon">⏺️</span><h3>Engine logging</h3>
                 <p>Records K-line and CAN engine data with the AC state as CSV, automatically every time the engine runs.</p></div>
             <div class="card"><span class="icon">🩺</span><h3>On-board diagnosis</h3>
-                <p>Analyses each log on the head unit with the Gauge.S analyser: likely faults ranked worst first, with evidence.</p></div>
+                <p>Analyses each log on the head unit with the Gauge.S analyser: likely faults ranked worst first, with evidence, backed by the ECU's own stored faults and adaptations, and compared with your earlier drives.</p></div>
             <div class="card"><span class="icon">☁️</span><h3>Google Drive upload</h3>
-                <p>Finished logs go to an “Bimmer Cockpit logs” folder in your Drive, including logs recorded while offline.</p></div>
+                <p>Finished logs and ECU data go to an “Bimmer Cockpit logs” folder in your Drive, including those recorded while offline.</p></div>
         </div>
     </div>
 </section>
@@ -246,6 +246,8 @@
                 <li><strong>Auto-record:</strong> a log starts with the engine and ends 15 s after it stops. LOGS in the top bar shows <code>● REC</code> while recording.</li>
                 <li><strong>Gauge.S format:</strong> the columns use the names the Gauge.S log analyser understands, and the AC state comes along.</li>
                 <li><strong>Analyse:</strong> runs the Gauge.S engine diagnosis on the head unit, offline. You get likely faults ranked worst first with their evidence, suggested checks, and the time spent in each operating state.</li>
+                <li><strong>ECU data:</strong> <em>Fault codes → Read ECU data</em> saves the stored faults with the learned fuel and octane adaptations, dated. The diagnosis uses the one taken nearest each drive: stored misfires by cylinder, codes that back up a finding, and a leak the ECU has already learned around.</li>
+                <li><strong>Earlier drives:</strong> each analysis is kept as a few numbers, and later drives are compared with them, so idle trim creeping or idle speed changing shows up before any fixed limit trips.</li>
                 <li><strong>Google Drive:</strong> connect once, and finished logs upload to an “Bimmer Cockpit logs” folder. The app can only see the files it created.</li>
                 <li><strong>Share:</strong> send a log or a diagnosis report to any app.</li>
             </ul>
