@@ -138,6 +138,7 @@
             <a href="#climate">Climate</a>
             <a href="#gauges">Gauges</a>
             <a href="#logs">Logs</a>
+            <a href="#ecu">ECU data</a>
             <a href="#hardware">Module</a>
             <a href="#get">Get it</a>
         </nav>
@@ -239,7 +240,7 @@
 <section id="logs">
     <div class="wrap split">
         <div class="media stack">
-            <img class="shot" src="screenshots/logs.png" alt="Engine logs list with Analyse, Share and Delete, and Google Drive upload state" width="1280" height="720" loading="lazy">
+            <img class="shot" src="screenshots/logs.png" alt="Engine logs list on the Drives tab, with Analyse, Share and Delete for each drive" width="1280" height="720" loading="lazy">
             <img class="shot" src="screenshots/analysis.png" alt="Engine diagnosis of a log: a vacuum leak finding with evidence and suggested checks" width="1280" height="720" loading="lazy">
         </div>
         <div>
@@ -250,8 +251,7 @@
                 <li><strong>Auto-record:</strong> a log starts with the engine and ends 15 s after it stops. LOGS in the top bar shows <code>● REC</code> while recording.</li>
                 <li><strong>Gauge.S format:</strong> the columns use the names the Gauge.S log analyser understands, and the AC state comes along.</li>
                 <li><strong>Analyse:</strong> runs the Gauge.S engine diagnosis on the head unit, offline. You get likely faults ranked worst first with their evidence, suggested checks, and the time spent in each operating state.</li>
-                <li><strong>ECU data:</strong> <em>Fault codes → Read ECU data</em> saves, dated, what the MS43 has stored: the faults, the learned fuel adaptations for both banks, the learned idle air (in neutral, in gear, with the AC on), the octane adaptation, the misfire counters and rough running per cylinder, and whether it sees the AC request, the compressor relay, closed-loop fuelling and the purge valve. It asks the way INPA does, so it works on any MS43 software. The diagnosis uses the snapshot taken nearest each drive: misfires by cylinder, even before the ECU has stored a fault, codes that back up a finding, the idle air behind a rough idle, and a leak the ECU has already learned around.</li>
-                <li><strong>Fault details:</strong> <em>Fault codes → Load MS430DS0.prg</em> reads BMW's MS43 file from your own INPA install once. From then on each fault shows its type (short to ground, open circuit…) and the engine speed, load or temperature it was stored at, as INPA shows them. The app keeps only the fault tables from the file; BMW's file isn't included with the app.</li>
+                <li><strong>ECU data:</strong> the faults and learned values the ECU had stored, saved next to the drives (see <a href="#ecu">ECU data</a> below). The diagnosis uses the snapshot taken nearest each drive.</li>
                 <li><strong>Earlier drives:</strong> each analysis is kept as a few numbers, and later drives are compared with them, so idle trim creeping or idle speed changing shows up before any fixed limit trips.</li>
                 <li><strong>Google Drive:</strong> connect once, and finished logs upload to an “Bimmer Cockpit logs” folder. The app can only see the files it created.</li>
                 <li><strong>Share:</strong> send a log or a diagnosis report to any app.</li>
@@ -261,8 +261,32 @@
     </div>
 </section>
 
-<section id="setup">
+<section id="ecu">
     <div class="wrap split flip">
+        <div class="media stack">
+            <img class="shot" src="screenshots/ecu-data.png" alt="An ECU snapshot: stored faults as cards with the code, present now, how often seen, the fault type and the engine speed and load when stored; fuel adaptation bars per bank, learned idle air, octane adaptation, misfire counts per cylinder and on/off status pills" width="1280" height="1396" loading="lazy">
+            <img class="shot" src="screenshots/ecu-list.png" alt="The ECU data tab: saved snapshots with a red, amber or green dot, the number of faults and the DME part number" width="1280" height="720" loading="lazy">
+        </div>
+        <div>
+            <div class="label">ECU data</div>
+            <h2>What the ECU has stored, at a glance</h2>
+            <p class="sub"><em>Fault codes → Read ECU data</em> takes a dated snapshot of the MS43, with the Gauge S off. It asks the way INPA does, so it works on any MS43 software.</p>
+            <ul>
+                <li><strong>Faults:</strong> one card per stored fault, with its BMW code, whether it is present now and how often it was seen. With the fault details loaded you also get its type (short to ground, open circuit…) and the engine speed and load when it was stored.</li>
+                <li><strong>Fuel adaptation:</strong> what the ECU has learned to add or take away per bank, at idle and at every load. Green is normal, amber is worth watching, red is near the limit, using the same limits as the diagnosis.</li>
+                <li><strong>Idle air and octane:</strong> the learned idle air in neutral, in gear and with the AC on, and how far the ECU has moved toward its low-octane ignition map.</li>
+                <li><strong>Misfires per cylinder:</strong> the ECU's own counters, so one bad coil, plug or injector stands out before a fault is stored.</li>
+                <li><strong>What the MS43 saw:</strong> AC request, compressor, purge valve, closed-loop fuelling per bank and the warning lamps, on or off.</li>
+                <li><strong>Kept for later:</strong> every snapshot is listed under <em>Logs → ECU data</em>, newest first, with a dot that shows red for a fault present now, amber for stored faults and green for none. Snapshots upload to Google Drive with the logs.</li>
+                <li><strong>Fault details:</strong> <em>Fault codes → Load MS430DS0.prg</em> reads BMW's MS43 file from your own INPA install once. The app keeps only the fault tables from the file; BMW's file isn't included with the app.</li>
+            </ul>
+            <p class="note">The snapshot shown here is sample data, not a real car.</p>
+        </div>
+    </div>
+</section>
+
+<section id="setup">
+    <div class="wrap split">
         <div class="media">
             <img class="shot" src="screenshots/settings.png" alt="Settings: AC pressure cut-out, engine logs, Google Drive and module firmware" width="760" height="720" loading="lazy" style="max-width:520px;margin:0 auto">
         </div>
